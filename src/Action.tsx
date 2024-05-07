@@ -1,7 +1,8 @@
 import { render } from "preact";
+import ReadingList from "./components/ReadingList";
 
 const ActionPage = () => {
-	return <div>ActionPage</div>;
+	return <ReadingList />;
 };
 
 render(<ActionPage />, document.getElementById("action")!);
