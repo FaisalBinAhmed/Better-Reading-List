@@ -1,8 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "Chrome Extension with Preact and Vite",
-	"short_name": "CEPV",
-	"description": "A Chrome Extension Boilerplate for Preact with Manifest Version 3",
+	"name": "Better Reading List",
+	"short_name": "Better Reading List",
+	"description": "A better way to manage browser's native reading list",
 	"version": "1.0",
 	"author": "Faisal Ahmed",
 	"background": {
@@ -26,5 +26,5 @@
 		"page": "src/options/options.html",
 		"open_in_tab": true
 	},
-	"permissions": ["tabs"]
+	"permissions": ["readingList"]
 }
