@@ -2,20 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 18, 18, 18;
+    --background-end-rgb: 18, 18, 18;
+  }
+
 body {
   font-family: sans-serif;
-  width:  250px;
-  margin: 10px;
-}
-
-h1 {
-  font-weight: bold;
-  font-size: 14px;
-  margin: 10px 0;
-}
-
-h2 {
-  font-weight: bold;
-  font-size: 12px;
-  margin: 10px 0 4px 0;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
