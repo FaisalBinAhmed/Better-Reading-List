@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 const ReadingList = () => {
 	const [listItems, setListItems] = useState<string[]>([]);
 
@@ -13,7 +13,7 @@ const ReadingList = () => {
 
 	return (
 		<div>
-			<h1>Reading List</h1>
+			<div className="text-xs text-neutral-100 border-b">Reading List</div>
 			<ul>
 				{listItems.map((item) => (
 					<li>
