@@ -1,13 +1,20 @@
 import { useEffect, useState } from "preact/hooks";
+
+type ReadingListItem = {
+	title: string;
+	url: string;
+};
+
 const ReadingList = () => {
-	const [listItems, setListItems] = useState<string[]>([]);
+	const [listItems, setListItems] = useState<ReadingListItem[]>([]);
 
 	useEffect(() => {
 		fetchListItems();
 	}, []);
 
 	async function fetchListItems() {
-		const items = await chrome.readingList.query({});
+		// @ts-ignore
+		const items = (await chrome.readingList.query({})) as ReadingListItem[]; //until the API is available in the typedef
 		setListItems(items);
 	}
 
