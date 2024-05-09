@@ -51,8 +51,16 @@ const ReadingList = () => {
 		return url.toString();
 	}
 
-	function openUrl(url?: string) {
-		window.open(url, "_blank");
+	// function openUrl(url?: string) {
+	// 	window.open(url, "_blank");
+	// }
+
+	function refreshListItems() {
+		if (itemType === "all") {
+			fetchListItems();
+		} else {
+			fetchUnreadItems();
+		}
 	}
 
 	async function deleteItem(url?: string) {
@@ -63,11 +71,7 @@ const ReadingList = () => {
 		await chrome.readingList.removeEntry({ url });
 
 		// todo: update the listItems state to reflect the change instead of refetching
-		if (itemType === "all") {
-			fetchListItems();
-		} else {
-			fetchUnreadItems();
-		}
+		refreshListItems();
 	}
 
 	async function addCurrentTab() {
@@ -76,53 +80,104 @@ const ReadingList = () => {
 		});
 
 		// @ts-ignore
-		chrome.readingList.addEntry({
+		await chrome.readingList.addEntry({
 			title: currentTab[0].title,
 			url: currentTab[0].url,
 			hasBeenRead: false
 		});
+
+		refreshListItems();
+	}
+
+	async function changeReadStatus(url?: string, hasBeenRead?: boolean) {
+		if (!url) {
+			return;
+		}
+
+		// @ts-ignore
+		await chrome.readingList.updateEntry({
+			url,
+			hasBeenRead
+		});
+		//temp todo:
+		refreshListItems();
 	}
 
 	return (
-		<div className="w-[300px] p-2">
-			<div className="mx-2 text-xl">Reading List</div>
+		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
+			<div className="">Better Reading List</div>
 			<div
 				onClick={addCurrentTab}
-				className="text-lg bg-black p-4 my-2 text-center cursor-pointer">
+				className="text-lg bg-black p-4 my-2 text-center rounded cursor-pointer hover:text-green-400">
 				Add current tab to list
 			</div>
-			<div className="flex bg-black rounded items-end flex-row p-2 gap-2 my-2">
-				<button
-					onClick={fetchListItems}
-					className={itemType === "all" ? "text-white" : "text-neutral-400"}>
-					All
-				</button>
-				<button
-					onClick={fetchUnreadItems}
-					className={itemType === "unread" ? "text-white" : "text-neutral-400"}>
-					Unread
-				</button>
+			<div className="flex flex-row items-center justify-between gap-2 my-2">
+				<p>Items: {listItems.length}</p>
+				<div className="flex bg-black rounded flex-row p-2 gap-2">
+					<button
+						onClick={fetchListItems}
+						className={itemType === "all" ? "text-white" : "text-neutral-400"}>
+						All
+					</button>
+					<button
+						onClick={fetchUnreadItems}
+						className={
+							itemType === "unread" ? "text-white" : "text-neutral-400"
+						}>
+						Unread
+					</button>
+				</div>
 			</div>
 			<div className="flex flex-col gap-2">
 				{listItems.map((item) => (
-					<div
-						onClick={() => openUrl(item.url)}
-						className="flex flex-row bg-black cursor-pointer p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
-						<img
-							src={getFaviconUrl(item.url)}
-							alt="favicon"
-							className="w-8 h-8"
-						/>
-						<div className="flex-1 flex flex-col gap-1">
+					<a
+						// onClick={() => openUrl(item.url)}
+						key={item.url}
+						href={item.url}
+						target={"_blank"}
+						className="flex flex-row bg-black cursor-pointer  p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
+						<div className="items-start flex">
+							<img
+								src={getFaviconUrl(item.url)}
+								alt="favicon"
+								className="w-8 h-8 bg-[#252525] p-2 rounded"
+							/>
+						</div>
+						<div className="flex-1 flex items-start flex-col gap-1 ">
 							<div className="line-clamp-2">{item.title}</div>
 							<div className="text-neutral-400 text-xs">
 								{getUrlDomain(item.url)}
 							</div>
 						</div>
-						<div>
+						<div className="flex flex-row gap-2 items-start">
+							{item.hasBeenRead ? (
+								<img
+									src="/icons/envelope-open.svg"
+									alt="unread"
+									title={"Mark as unread"}
+									className="w-4 h-4"
+									onClick={(e) => {
+										e.stopPropagation();
+										changeReadStatus(item.url, false);
+									}}
+								/>
+							) : (
+								<img
+									src="/icons/envelope.svg"
+									alt="read"
+									title={"Mark as read"}
+									className="w-4 h-4"
+									onClick={(e) => {
+										e.stopPropagation();
+										changeReadStatus(item.url, true);
+									}}
+								/>
+							)}
+
 							<img
 								src="/icons/trash.svg"
 								alt="delete"
+								title={"Delete"}
 								className="w-4 h-4"
 								onClick={(e) => {
 									e.stopPropagation();
@@ -130,7 +185,7 @@ const ReadingList = () => {
 								}}
 							/>
 						</div>
-					</div>
+					</a>
 				))}
 			</div>
 		</div>
