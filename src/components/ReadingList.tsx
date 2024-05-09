@@ -134,6 +134,7 @@ const ReadingList = () => {
 						// onClick={() => openUrl(item.url)}
 						key={item.url}
 						href={item.url}
+						title={item.title}
 						target={"_blank"}
 						className="flex flex-row bg-black cursor-pointer  p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
 						<div className="items-start flex">
