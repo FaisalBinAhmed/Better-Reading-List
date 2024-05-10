@@ -5,19 +5,9 @@
 	"description": "A better way to manage browser's native reading list",
 	"version": "1.0",
 	"author": "Faisal Ahmed",
-	"background": {
-		"service_worker": "assets/background.js",
-		"type": "module"
-	},
 	"icons": {
 		"128": "/icon.png"
 	},
-	"content_scripts": [
-		{
-			"js": ["assets/contentScript.js"],
-			"matches": ["http://*/*", "https://*/*"]
-		}
-	],
 	"action": {
 		"default_title": "Browser Action",
 		"default_popup": "src/action.html"

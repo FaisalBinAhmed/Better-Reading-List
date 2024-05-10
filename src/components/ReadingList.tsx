@@ -20,7 +20,6 @@ export async function setOneStorageObject(
 	} catch (error) {}
 }
 
-
 type ReadingListItem = {
 	title?: string;
 	url?: string;
@@ -84,203 +83,201 @@ const ReadingList = () => {
 	}
 
 	function openUrl(url?: string) {
-        markReadIfNeeded(url);
+		markReadIfNeeded(url);
 		window.open(url, "_blank");
 	}
 
-    async function markReadIfNeeded(url?: string) {
-			const value = await getOneStorageItem("autoRead");
+	async function markReadIfNeeded(url?: string) {
+		const value = await getOneStorageItem("autoRead");
 
-			if (value?.autoRead) {
-				changeReadStatus(url, true);
-			}
+		if (value?.autoRead) {
+			changeReadStatus(url, true);
 		}
+	}
 
-		function refreshListItems() {
-			switch (itemType) {
-				case "all":
-					fetchListItems();
-					break;
-				case "unread":
-					fetchUnreadItems();
-					break;
-				case "read":
-					fetchReadItems();
-					break;
-			}
+	function refreshListItems() {
+		switch (itemType) {
+			case "all":
+				fetchListItems();
+				break;
+			case "unread":
+				fetchUnreadItems();
+				break;
+			case "read":
+				fetchReadItems();
+				break;
 		}
+	}
 
-		async function deleteItem(url?: string) {
-			if (!url) {
-				return;
-			}
-			// @ts-ignore
-			await chrome.readingList.removeEntry({ url });
-
-			// todo: update the listItems state to reflect the change instead of refetching
-			refreshListItems();
+	async function deleteItem(url?: string) {
+		if (!url) {
+			return;
 		}
+		// @ts-ignore
+		await chrome.readingList.removeEntry({ url });
 
-		async function addCurrentTab() {
-			const currentTab = await chrome.tabs.query({
-				active: true
-			});
+		// todo: update the listItems state to reflect the change instead of refetching
+		refreshListItems();
+	}
 
+	async function addCurrentTab() {
+		const currentTab = await chrome.tabs.query({
+			active: true
+		});
+
+		try {
 			// @ts-ignore
 			await chrome.readingList.addEntry({
 				title: currentTab[0].title,
 				url: currentTab[0].url,
 				hasBeenRead: false
 			});
+		} catch (error) {}
 
-			refreshListItems();
+		refreshListItems();
+	}
+
+	async function changeReadStatus(url?: string, hasBeenRead?: boolean) {
+		if (!url) {
+			return;
 		}
 
-		async function changeReadStatus(url?: string, hasBeenRead?: boolean) {
-			if (!url) {
-				return;
-			}
+		// @ts-ignore
+		await chrome.readingList.updateEntry({
+			url,
+			hasBeenRead
+		});
+		//temp todo:
+		refreshListItems();
+	}
 
-			// @ts-ignore
-			await chrome.readingList.updateEntry({
-				url,
-				hasBeenRead
-			});
-			//temp todo:
-			refreshListItems();
-		}
+	function openSettings() {
+		chrome.runtime.openOptionsPage();
+	}
 
-		function openSettings() {
-			chrome.runtime.openOptionsPage();
-		}
+	function openWebsite() {
+		window.open("https://failab.eu", "_blank");
+	}
 
-		function openWebsite() {
-			window.open("https://failab.eu", "_blank");
-		}
-
-		return (
-			<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
-				<div className="flex flex-row justify-between items-center">
-					<div className="font-bold flex flex-col text-base">
-						<div className="text-white">Better</div>
-						<h1 className="text-neutral-500 -mt-2">Reading List</h1>
-					</div>
-					<div className="flex flex-row gap-1">
-						<img
-							src="/icons/heart.svg"
-							alt="website"
-							title="Visit website"
-							className="w-6 h-6 cursor-pointer"
-							onClick={openWebsite}
-						/>
-
-						<img
-							src="/icons/cog.svg"
-							alt="settings"
-							title="Settings"
-							className="w-6 h-6 cursor-pointer"
-							onClick={openSettings}
-						/>
-					</div>
+	return (
+		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
+			<div className="flex flex-row justify-between items-center">
+				<div className="font-bold flex flex-col text-base">
+					<div className="text-white">Better</div>
+					<h1 className="text-neutral-500 -mt-2">Reading List</h1>
 				</div>
-				<div
-					onClick={addCurrentTab}
-					title="Add the current tab to the reading list"
-					className="text-lg font-semibold text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
-					Add this tab
+				<div className="flex flex-row gap-1">
+					<img
+						src="/icons/heart.svg"
+						alt="website"
+						title="Visit website"
+						className="w-6 h-6 cursor-pointer"
+						onClick={openWebsite}
+					/>
+
+					<img
+						src="/icons/cog.svg"
+						alt="settings"
+						title="Settings"
+						className="w-6 h-6 cursor-pointer"
+						onClick={openSettings}
+					/>
 				</div>
-				<div className="flex flex-row items-center justify-between gap-2 my-2">
-					<div className="flex flex-row gap-1 items-center">
-						<img src="/icons/inbox.svg" alt="inbox" className="w-4 h-4" />
-						<p className="">{listItems.length}</p>
-					</div>
-					<div className="flex bg-black rounded flex-row p-2 gap-2">
-						<button
-							onClick={fetchListItems}
-							className={
-								itemType === "all" ? "text-white" : "text-neutral-400"
-							}>
-							All
-						</button>
-						<button
-							onClick={fetchUnreadItems}
-							className={
-								itemType === "unread" ? "text-white" : "text-neutral-400"
-							}>
-							Unread
-						</button>
-						<button
-							onClick={fetchReadItems}
-							className={
-								itemType === "read" ? "text-white" : "text-neutral-400"
-							}>
-							Read
-						</button>
-					</div>
+			</div>
+			<div
+				onClick={addCurrentTab}
+				title="Add the current tab to the reading list"
+				className="text-lg font-semibold text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
+				Add this tab
+			</div>
+			<div className="flex flex-row items-center justify-between gap-2 my-2">
+				<div className="flex flex-row gap-1 items-center">
+					<img src="/icons/inbox.svg" alt="inbox" className="w-4 h-4" />
+					<p className="">{listItems.length}</p>
 				</div>
-				<div className="flex flex-col gap-1">
-					{listItems.map((item) => (
-						<div
-							onClick={() => openUrl(item.url)}
-							key={item.url}
-							href={item.url}
-							title={item.title}
-							target={"_blank"}
-							className="flex flex-row bg-black cursor-pointer  p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
-							<div className="items-start flex">
-								<img
-									src={getFaviconUrl(item.url)}
-									alt="favicon"
-									className="w-8 h-8 bg-[#252525] p-2 rounded"
-								/>
+				<div className="flex bg-black rounded flex-row p-2 gap-2">
+					<button
+						onClick={fetchListItems}
+						className={itemType === "all" ? "text-white" : "text-neutral-400"}>
+						All
+					</button>
+					<button
+						onClick={fetchUnreadItems}
+						className={
+							itemType === "unread" ? "text-white" : "text-neutral-400"
+						}>
+						Unread
+					</button>
+					<button
+						onClick={fetchReadItems}
+						className={itemType === "read" ? "text-white" : "text-neutral-400"}>
+						Read
+					</button>
+				</div>
+			</div>
+			<div className="flex flex-col gap-1">
+				{listItems.map((item) => (
+					<div
+						onClick={() => openUrl(item.url)}
+						key={item.url}
+						href={item.url}
+						title={item.title}
+						target={"_blank"}
+						className="flex flex-row bg-black cursor-pointer  p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
+						<div className="items-start flex">
+							<img
+								src={getFaviconUrl(item.url)}
+								alt="favicon"
+								className="w-8 h-8 bg-[#252525] p-2 rounded"
+							/>
+						</div>
+						<div className="flex-1 flex items-start flex-col gap-1 ">
+							<div className="line-clamp-2">{item.title}</div>
+							<div className="text-neutral-400 text-xs">
+								{getUrlDomain(item.url)}
 							</div>
-							<div className="flex-1 flex items-start flex-col gap-1 ">
-								<div className="line-clamp-2">{item.title}</div>
-								<div className="text-neutral-400 text-xs">
-									{getUrlDomain(item.url)}
-								</div>
-							</div>
-							<div className="flex flex-row gap-2 items-start">
-								{item.hasBeenRead ? (
-									<img
-										src="/icons/envelope-open.svg"
-										alt="unread"
-										title={"Mark as unread"}
-										className="w-4 h-4"
-										onClick={(e) => {
-											e.stopPropagation();
-											changeReadStatus(item.url, false);
-										}}
-									/>
-								) : (
-									<img
-										src="/icons/envelope.svg"
-										alt="read"
-										title={"Mark as read"}
-										className="w-4 h-4"
-										onClick={(e) => {
-											e.stopPropagation();
-											changeReadStatus(item.url, true);
-										}}
-									/>
-								)}
-
+						</div>
+						<div className="flex flex-row gap-2 items-start">
+							{item.hasBeenRead ? (
 								<img
-									src="/icons/trash.svg"
-									alt="delete"
-									title={"Delete"}
+									src="/icons/envelope-open.svg"
+									alt="unread"
+									title={"Mark as unread"}
 									className="w-4 h-4"
 									onClick={(e) => {
 										e.stopPropagation();
-										deleteItem(item.url);
+										changeReadStatus(item.url, false);
 									}}
 								/>
-							</div>
+							) : (
+								<img
+									src="/icons/envelope.svg"
+									alt="read"
+									title={"Mark as read"}
+									className="w-4 h-4"
+									onClick={(e) => {
+										e.stopPropagation();
+										changeReadStatus(item.url, true);
+									}}
+								/>
+							)}
+
+							<img
+								src="/icons/trash.svg"
+								alt="delete"
+								title={"Delete"}
+								className="w-4 h-4"
+								onClick={(e) => {
+									e.stopPropagation();
+									deleteItem(item.url);
+								}}
+							/>
 						</div>
-					))}
-				</div>
+					</div>
+				))}
 			</div>
-		);
+		</div>
+	);
 };
 
 export default ReadingList;
