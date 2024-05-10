@@ -14,9 +14,11 @@ function getUrlDomain(url?: string) {
 	return urlObj.hostname;
 }
 
+type ItemFilterType = "all" | "unread" | "read";
+
 const ReadingList = () => {
 	const [listItems, setListItems] = useState<ReadingListItem[]>([]);
-	const [itemType, setItemType] = useState<"all" | "unread">("all");
+	const [itemType, setItemType] = useState<ItemFilterType>("all");
 
 	useEffect(() => {
 		fetchListItems();
@@ -38,6 +40,15 @@ const ReadingList = () => {
 		setListItems(items);
 	}
 
+	async function fetchReadItems() {
+		// @ts-ignore
+		const items = (await chrome.readingList.query({
+			hasBeenRead: true
+		})) as ReadingListItem[];
+		setItemType("read");
+		setListItems(items);
+	}
+
 	function getFaviconUrl(link?: string) {
 		// return `https://www.google.com/s2/favicons?domain=${url}&sz=128`; // this will throw third party cookies warning
 
@@ -51,9 +62,9 @@ const ReadingList = () => {
 		return url.toString();
 	}
 
-	// function openUrl(url?: string) {
-	// 	window.open(url, "_blank");
-	// }
+	function openUrl(url?: string) {
+		window.open(url, "_blank");
+	}
 
 	function refreshListItems() {
 		if (itemType === "all") {
@@ -105,14 +116,17 @@ const ReadingList = () => {
 
 	return (
 		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
-			<div className="">Better Reading List</div>
+			<div className="font-bold flex flex-col text-base">
+				<div className="text-white">Better</div>
+				<h1 className="text-neutral-500 -mt-2">Reading List</h1>
+			</div>
 			<div
 				onClick={addCurrentTab}
-				className="text-lg bg-black p-4 my-2 text-center rounded cursor-pointer hover:text-green-400">
-				Add current tab to list
+				className="text-lg text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
+				Add this tab
 			</div>
 			<div className="flex flex-row items-center justify-between gap-2 my-2">
-				<p>Items: {listItems.length}</p>
+				<p className="">Items: {listItems.length}</p>
 				<div className="flex bg-black rounded flex-row p-2 gap-2">
 					<button
 						onClick={fetchListItems}
@@ -126,12 +140,17 @@ const ReadingList = () => {
 						}>
 						Unread
 					</button>
+					<button
+						onClick={fetchReadItems}
+						className={itemType === "read" ? "text-white" : "text-neutral-400"}>
+						Read
+					</button>
 				</div>
 			</div>
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-1">
 				{listItems.map((item) => (
-					<a
-						// onClick={() => openUrl(item.url)}
+					<div
+						onClick={() => openUrl(item.url)}
 						key={item.url}
 						href={item.url}
 						title={item.title}
@@ -186,7 +205,7 @@ const ReadingList = () => {
 								}}
 							/>
 						</div>
-					</a>
+					</div>
 				))}
 			</div>
 		</div>
