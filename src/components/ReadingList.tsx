@@ -120,14 +120,28 @@ const ReadingList = () => {
 		refreshListItems();
 	}
 
+	function openSettings() {
+		chrome.runtime.openOptionsPage();
+	}
+
 	return (
 		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
-			<div className="font-bold flex flex-col text-base">
-				<div className="text-white">Better</div>
-				<h1 className="text-neutral-500 -mt-2">Reading List</h1>
+			<div className="flex flex-row justify-between items-center">
+				<div className="font-bold flex flex-col text-base">
+					<div className="text-white">Better</div>
+					<h1 className="text-neutral-500 -mt-2">Reading List</h1>
+				</div>
+				<img
+					src="/icons/cog.svg"
+					alt="settings"
+					title="Settings"
+					className="w-6 h-6 cursor-pointer"
+					onClick={openSettings}
+				/>
 			</div>
 			<div
 				onClick={addCurrentTab}
+				title="Add the current tab to the reading list"
 				className="text-lg font-semibold text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
 				Add this tab
 			</div>
