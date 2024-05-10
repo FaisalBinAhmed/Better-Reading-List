@@ -26,5 +26,5 @@
 		"page": "src/options/options.html",
 		"open_in_tab": true
 	},
-	"permissions": ["readingList", "favicon", "tabs"]
+	"permissions": ["readingList", "favicon", "tabs", "storage"]
 }
