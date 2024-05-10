@@ -67,10 +67,16 @@ const ReadingList = () => {
 	}
 
 	function refreshListItems() {
-		if (itemType === "all") {
-			fetchListItems();
-		} else {
-			fetchUnreadItems();
+		switch (itemType) {
+			case "all":
+				fetchListItems();
+				break;
+			case "unread":
+				fetchUnreadItems();
+				break;
+			case "read":
+				fetchReadItems();
+				break;
 		}
 	}
 
@@ -122,11 +128,14 @@ const ReadingList = () => {
 			</div>
 			<div
 				onClick={addCurrentTab}
-				className="text-lg text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
+				className="text-lg font-semibold text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
 				Add this tab
 			</div>
 			<div className="flex flex-row items-center justify-between gap-2 my-2">
-				<p className="">Items: {listItems.length}</p>
+				<div className="flex flex-row gap-1 items-center">
+					<img src="/icons/inbox.svg" alt="inbox" className="w-4 h-4" />
+					<p className="">{listItems.length}</p>
+				</div>
 				<div className="flex bg-black rounded flex-row p-2 gap-2">
 					<button
 						onClick={fetchListItems}
