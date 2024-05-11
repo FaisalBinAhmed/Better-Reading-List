@@ -9,7 +9,6 @@ export async function getOneStorageItem(itemKey: StorageKey) {
 		return chrome.storage.sync.get(itemKey);
 	} catch (error) {}
 }
-//TODO: make the return value typesafe. DONE
 
 export async function setOneStorageObject(
 	itemKey: StorageKey,
@@ -164,7 +163,7 @@ const ReadingList = () => {
 			<div className="flex flex-row justify-between items-center">
 				<div className="font-bold flex flex-col text-base">
 					<div className="text-white">Better</div>
-					<h1 className="text-neutral-500 -mt-2">Reading List</h1>
+					<div className="text-neutral-500 -mt-2">Reading List</div>
 				</div>
 				<div className="flex flex-row gap-1">
 					<img
@@ -187,13 +186,13 @@ const ReadingList = () => {
 			<div
 				onClick={addCurrentTab}
 				title="Add the current tab to the reading list"
-				className="text-lg font-semibold text-neutral-200 bg-[#121212] p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
+				className="text-lg font-semibold text-neutral-200 bg-[#121212] p-2 my-2 text-center rounded cursor-pointer hover:text-[#a2de96]">
 				Add this tab
 			</div>
 			<div className="flex flex-row items-center justify-between gap-2 my-2">
 				<div className="flex flex-row gap-1 items-center">
 					<img src="/icons/inbox.svg" alt="inbox" className="w-4 h-4" />
-					<p className="">{listItems.length}</p>
+					<p className="text-[#737373]">{listItems.length}</p>
 				</div>
 				<div className="flex bg-[#121212] rounded flex-row p-2 gap-2">
 					<button

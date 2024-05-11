@@ -2,14 +2,14 @@
 	"manifest_version": 3,
 	"name": "Better Reading List",
 	"short_name": "Better Reading List",
-	"description": "A better way to manage browser's native reading list",
+	"description": "A better way to manage your browser's built-in reading list",
 	"version": "1.0",
 	"author": "Faisal Ahmed",
 	"icons": {
 		"128": "/icon.png"
 	},
 	"action": {
-		"default_title": "Browser Action",
+		"default_title": "Better Reading List",
 		"default_popup": "src/action.html"
 	},
 	"options_ui": {
