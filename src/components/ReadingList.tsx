@@ -187,7 +187,7 @@ const ReadingList = () => {
 			<div
 				onClick={addCurrentTab}
 				title="Add the current tab to the reading list"
-				className="text-lg font-semibold text-neutral-200 bg-black p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
+				className="text-lg font-semibold text-neutral-200 bg-[#121212] p-2 my-2 text-center rounded cursor-pointer hover:text-green-400">
 				Add this tab
 			</div>
 			<div className="flex flex-row items-center justify-between gap-2 my-2">
@@ -195,7 +195,7 @@ const ReadingList = () => {
 					<img src="/icons/inbox.svg" alt="inbox" className="w-4 h-4" />
 					<p className="">{listItems.length}</p>
 				</div>
-				<div className="flex bg-black rounded flex-row p-2 gap-2">
+				<div className="flex bg-[#121212] rounded flex-row p-2 gap-2">
 					<button
 						onClick={fetchListItems}
 						className={itemType === "all" ? "text-white" : "text-neutral-400"}>
@@ -223,7 +223,7 @@ const ReadingList = () => {
 						href={item.url}
 						title={item.title}
 						target={"_blank"}
-						className="flex flex-row bg-black cursor-pointer  p-2 gap-2 hover:bg-[#252525] rounded border border-white/[0.1]">
+						className="flex flex-row bg-[#121212] cursor-pointer  p-3 gap-3 hover:bg-[#252525] rounded  border-white/[0.1]">
 						<div className="items-start flex">
 							<img
 								src={getFaviconUrl(item.url)}
