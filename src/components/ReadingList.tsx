@@ -4,6 +4,9 @@ import { useEffect, useState } from "preact/hooks";
 
 type StorageKey = "autoRead";
 
+const STORE_LINK =
+	"https://chromewebstore.google.com/detail/better-reading-list/dhadoebaijmhnilklfmbjnbfgbfmogln";
+
 export async function getOneStorageItem(itemKey: StorageKey) {
 	try {
 		return chrome.storage.sync.get(itemKey);
@@ -155,7 +158,7 @@ const ReadingList = () => {
 	}
 
 	function openWebsite() {
-		window.open("https://failab.eu", "_blank");
+		window.open(STORE_LINK, "_blank");
 	}
 
 	return (
