@@ -1,23 +1,14 @@
-# Chrome-Extension-Preact-Vite-Manifest-3 (CEPV)
+# Better Reading List
 
 
 ![CEPV Icon](/public/icon.png "CEPV Icon")
 
-This is a Chrome Extension boilerplate with Preact and Vite bundler support out of the box.
-The extension is targeted for manifest version 3. This should make it futureproof for newer extension development.
+A better way to manage your browser's built-in reading list
 
-The extension includes:
+Better Reading List makes it easier to read and add item to Chrome's built in Reading List.
+If you use the browser's native Reading List, this is a must have extension for you.
 
-- Preact based Action Page (popup that appears when user clicks on the extension icon from broswer toolbar)
-- Preact based Options UI (Extension settings page)
-- Typescript-native
-- Intellisense support for Chrome APIs
-- And many more..
-
-To start, clone the project and run `npm install` to install all dependencies. Finally, run `npm build` to run the app. This command should build/bundle everything in the `dist` folder.
-
-From Chrome/Microsoft Edge, go to Extensions page, turn on Developer Mode, and then load unpacked. Select the dist folder as the source of the extension, this should install the app in the browser.
-
-Try editing the `src/Action.tsx` and `src/options/Settings.tsx` files and see the changes reflect automatically.
-
-Feedback/Discussions and pull requests are welcome. :)
+With Better Reading List, you can quickly add the current tab to the Reading List.
+The extension also let's you:
+- Filter your Reading List for read/unread items
+- and automatically mark open items as Read (enable it in Settings).
