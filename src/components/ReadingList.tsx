@@ -6,6 +6,14 @@ import ListItem from "./ListItem";
 const STORE_LINK =
 	"https://chromewebstore.google.com/detail/better-reading-list/dhadoebaijmhnilklfmbjnbfgbfmogln";
 
+function openSettings() {
+	chrome.runtime.openOptionsPage();
+}
+
+function openWebsite() {
+	window.open(STORE_LINK, "_blank");
+}
+
 export type ReadingListItem = {
 	title?: string;
 	url?: string;
@@ -15,7 +23,17 @@ export type ReadingListItem = {
 type ItemFilterType = "all" | "unread" | "read";
 
 const ReadingList = () => {
+	// source of truth, not to be used directly
 	const [listItems, setListItems] = useState<ReadingListItem[]>([]);
+
+	// search results: filtered listItems based on search searchQuery
+	const [searchResults, setSearchResults] = useState<ReadingListItem[]>([]);
+
+	// whenever listItems change, update searchResults
+	useEffect(() => {
+		setSearchResults(listItems);
+	}, [listItems]);
+
 	const [itemType, setItemType] = useState<ItemFilterType>("all");
 
 	useEffect(() => {
@@ -78,15 +96,6 @@ const ReadingList = () => {
 
 		refreshListItems();
 	}
-
-	function openSettings() {
-		chrome.runtime.openOptionsPage();
-	}
-
-	function openWebsite() {
-		window.open(STORE_LINK, "_blank");
-	}
-
 	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
@@ -107,7 +116,7 @@ const ReadingList = () => {
 			}
 			return false;
 		});
-		setListItems(filteredItems);
+		setSearchResults(filteredItems);
 	};
 
 	return (
@@ -169,7 +178,7 @@ const ReadingList = () => {
 			<div className="mb-2">
 				<input
 					type="text"
-					className="w-full p-2 bg-[#121212] text-white rounded"
+					className="w-full p-2 bg-[#121212] text-white rounded focus:outline-none"
 					placeholder="Search"
 					value={searchQuery}
 					onInput={(e) => {
@@ -179,7 +188,7 @@ const ReadingList = () => {
 				/>
 			</div>
 			<div className="flex flex-col gap-1">
-				{listItems.map((item) => (
+				{searchResults.map((item) => (
 					<ListItem
 						{...item}
 						key={item.url}
