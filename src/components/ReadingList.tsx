@@ -120,7 +120,7 @@ const ReadingList = () => {
 	};
 
 	return (
-		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
+		<div className="w-[320px] flex-col overflow-scroll max-h-[540px] p-2">
 			<div className="flex flex-row justify-between items-center">
 				<div className="font-bold flex flex-col text-base">
 					<div className="text-white">Better</div>
