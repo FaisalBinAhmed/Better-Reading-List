@@ -1,40 +1,16 @@
 import { useEffect, useState } from "preact/hooks";
+import ListItem from "./ListItem";
 
 //dup for now
-
-type StorageKey = "autoRead";
 
 const STORE_LINK =
 	"https://chromewebstore.google.com/detail/better-reading-list/dhadoebaijmhnilklfmbjnbfgbfmogln";
 
-export async function getOneStorageItem(itemKey: StorageKey) {
-	try {
-		return chrome.storage.sync.get(itemKey);
-	} catch (error) {}
-}
-
-export async function setOneStorageObject(
-	itemKey: StorageKey,
-	value: boolean | number | string
-) {
-	try {
-		chrome.storage.sync.set({ [itemKey]: value });
-	} catch (error) {}
-}
-
-type ReadingListItem = {
+export type ReadingListItem = {
 	title?: string;
 	url?: string;
 	hasBeenRead?: boolean;
 };
-
-function getUrlDomain(url?: string) {
-	if (!url) {
-		return "";
-	}
-	const urlObj = new URL(url);
-	return urlObj.hostname;
-}
 
 type ItemFilterType = "all" | "unread" | "read";
 
@@ -71,32 +47,6 @@ const ReadingList = () => {
 		setListItems(items);
 	}
 
-	function getFaviconUrl(link?: string) {
-		// return `https://www.google.com/s2/favicons?domain=${url}&sz=128`; // this will throw third party cookies warning
-
-		if (!link) {
-			return;
-		}
-
-		const url = new URL(chrome.runtime.getURL("/_favicon/"));
-		url.searchParams.set("pageUrl", link);
-		url.searchParams.set("size", "128");
-		return url.toString();
-	}
-
-	function openUrl(url?: string) {
-		markReadIfNeeded(url);
-		window.open(url, "_blank");
-	}
-
-	async function markReadIfNeeded(url?: string) {
-		const value = await getOneStorageItem("autoRead");
-
-		if (value?.autoRead) {
-			changeReadStatus(url, true);
-		}
-	}
-
 	function refreshListItems() {
 		switch (itemType) {
 			case "all":
@@ -111,20 +61,10 @@ const ReadingList = () => {
 		}
 	}
 
-	async function deleteItem(url?: string) {
-		if (!url) {
-			return;
-		}
-		// @ts-ignore
-		await chrome.readingList.removeEntry({ url });
-
-		// todo: update the listItems state to reflect the change instead of refetching
-		refreshListItems();
-	}
-
 	async function addCurrentTab() {
 		const currentTab = await chrome.tabs.query({
-			active: true
+			active: true,
+			currentWindow: true
 		});
 
 		try {
@@ -139,20 +79,6 @@ const ReadingList = () => {
 		refreshListItems();
 	}
 
-	async function changeReadStatus(url?: string, hasBeenRead?: boolean) {
-		if (!url) {
-			return;
-		}
-
-		// @ts-ignore
-		await chrome.readingList.updateEntry({
-			url,
-			hasBeenRead
-		});
-		//temp todo:
-		refreshListItems();
-	}
-
 	function openSettings() {
 		chrome.runtime.openOptionsPage();
 	}
@@ -160,6 +86,29 @@ const ReadingList = () => {
 	function openWebsite() {
 		window.open(STORE_LINK, "_blank");
 	}
+
+	const [searchQuery, setSearchQuery] = useState("");
+
+	useEffect(() => {
+		if (searchQuery) {
+			performSearch();
+		} else {
+			refreshListItems();
+		}
+	}, [searchQuery]);
+
+	const performSearch = () => {
+		const filteredItems = listItems.filter((item) => {
+			if (item.title?.toLowerCase().includes(searchQuery.toLowerCase())) {
+				return true;
+			}
+			if (item.url?.toLowerCase().includes(searchQuery.toLowerCase())) {
+				return true;
+			}
+			return false;
+		});
+		setListItems(filteredItems);
+	};
 
 	return (
 		<div className="w-[320px] flex-col overflow-scroll max-h-[500px] p-2">
@@ -217,65 +166,25 @@ const ReadingList = () => {
 					</button>
 				</div>
 			</div>
+			<div className="mb-2">
+				<input
+					type="text"
+					className="w-full p-2 bg-[#121212] text-white rounded"
+					placeholder="Search"
+					value={searchQuery}
+					onInput={(e) => {
+						const value = e.currentTarget.value;
+						setSearchQuery(value);
+					}}
+				/>
+			</div>
 			<div className="flex flex-col gap-1">
 				{listItems.map((item) => (
-					<div
-						onClick={() => openUrl(item.url)}
+					<ListItem
+						{...item}
 						key={item.url}
-						href={item.url}
-						title={item.title}
-						target={"_blank"}
-						className="flex flex-row bg-[#121212] cursor-pointer  p-3 gap-3 hover:bg-[#252525] rounded  border-white/[0.1]">
-						<div className="items-start flex">
-							<img
-								src={getFaviconUrl(item.url)}
-								alt="favicon"
-								className="w-8 h-8 bg-[#252525] p-2 rounded"
-							/>
-						</div>
-						<div className="flex-1 flex items-start flex-col gap-1 ">
-							<div className="line-clamp-2">{item.title}</div>
-							<div className="text-neutral-400 text-xs">
-								{getUrlDomain(item.url)}
-							</div>
-						</div>
-						<div className="flex flex-row gap-2 items-start">
-							{item.hasBeenRead ? (
-								<img
-									src="/icons/envelope-open.svg"
-									alt="unread"
-									title={"Mark as unread"}
-									className="w-4 h-4"
-									onClick={(e) => {
-										e.stopPropagation();
-										changeReadStatus(item.url, false);
-									}}
-								/>
-							) : (
-								<img
-									src="/icons/envelope.svg"
-									alt="read"
-									title={"Mark as read"}
-									className="w-4 h-4"
-									onClick={(e) => {
-										e.stopPropagation();
-										changeReadStatus(item.url, true);
-									}}
-								/>
-							)}
-
-							<img
-								src="/icons/trash.svg"
-								alt="delete"
-								title={"Delete"}
-								className="w-4 h-4"
-								onClick={(e) => {
-									e.stopPropagation();
-									deleteItem(item.url);
-								}}
-							/>
-						</div>
-					</div>
+						refreshHandler={refreshListItems}
+					/>
 				))}
 			</div>
 		</div>
